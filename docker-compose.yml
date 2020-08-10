@@ -36,20 +36,27 @@ services:
     ports:
       - 32772:26257
       - 8008:8080
-    command: 
-      - start 
+    command:
+      - start
       - --insecure
     volumes:
       - cdb-data:/cockroach/cockroach-data
   elastic:
     image: elasticsearch:7.7.1
-    ports: 
+    ports:
       - 32774:9200
       - 32773:9300
-    environment: 
+    environment:
       - discovery.type=single-node
-    volumes: 
+    volumes:
       - el-data:/usr/share/elasticsearch/data
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - mq-data:/config/mosquitto.conf
 
 volumes:
   sql-data:
@@ -57,3 +64,4 @@ volumes:
   pg-data:
   cdb-data:
   el-data:
+  mq-data:

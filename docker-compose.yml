@@ -2,6 +2,7 @@ version: "3.1"
 
 services:
   mariadb:
+    container_name: mariadb
     image: mariadb
     volumes:
       - sql-data:/var/lib/mysql
@@ -10,6 +11,7 @@ services:
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
   mongodb:
+    container_name: mongodb
     image: mongo
     volumes:
       - mongo-data:/data/db
@@ -19,10 +21,12 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
   redis:
+    container_name: redis
     image: redis
     ports:
       - 32770:6379
   postgres:
+    container_name: postgres
     image: postgres
     ports:
       - 32771:5432
@@ -31,17 +35,8 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-  cockroach:
-    image: cockroachdb/cockroach
-    ports:
-      - 32772:26257
-      - 8008:8080
-    command:
-      - start
-      - --insecure
-    volumes:
-      - cdb-data:/cockroach/cockroach-data
   elastic:
+    container_name: elasticsearch
     image: elasticsearch:7.7.1
     ports:
       - 32774:9200
@@ -51,6 +46,7 @@ services:
     volumes:
       - el-data:/usr/share/elasticsearch/data
   mosquitto:
+    container_name: mosquitto
     image: eclipse-mosquitto
     ports:
       - 1883:1883
@@ -58,10 +54,34 @@ services:
     volumes:
       - mq-data:/config/mosquitto.conf
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper
+    container_name: zookeeper
+    restart: always
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+ 
+  kafka:
+    image: confluentinc/cp-kafka
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Set this based on the number of broker
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
 volumes:
   sql-data:
   mongo-data:
   pg-data:
-  cdb-data:
   el-data:
   mq-data:

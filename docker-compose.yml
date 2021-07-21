@@ -52,7 +52,7 @@ services:
       - 1883:1883
       - 9001:9001
     volumes:
-      - mq-data:/config/mosquitto.conf
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   # zookeeper:
   #   image: confluentinc/cp-zookeeper

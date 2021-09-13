@@ -53,6 +53,14 @@ services:
       - 9001:9001
     volumes:
       - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+  pubsub:
+    container_name: pubsub-emulator
+    image: singularities/pubsub-emulator
+    environment:
+      - PUBSUB_PROJECT_ID=REYSTAGING
+      - PUBSUB_LISTEN_ADDRESS=0.0.0.0:8888
+    ports:
+      - "8888:8888"
 
   # zookeeper:
   #   image: confluentinc/cp-zookeeper
